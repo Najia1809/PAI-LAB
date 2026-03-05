@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Recipe Search App</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto&family=Roboto+Slab&display=swap" rel="stylesheet">
+
+<style>
+/* Color Palette */
+:root {
+    --primary-accent: #5F334E; /* Deep Plum / Aubergine */
+    --secondary-accent: #DDB253; /* Ochre / Goldenrod */
+    --background: #F9F7F5; /* Off-White / Cream */
+    --text-color: #333333; /* Charcoal */
+}
+
+/* Global */
+body {
+    font-family: 'Roboto', sans-serif;
+    background: var(--background);
+    margin: 0;
+    padding: 0;
+    color: var(--text-color);
+    background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=80');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    position: relative;
+}
+body::after {
+    content: "";
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(249,247,245,0.95); /* Slight overlay for readability */
+    z-index: -1;
+}
+
+/* Header */
+header {
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 50px;
+    font-family: 'Roboto Slab', serif; /* Transitional Serif */
+    color: var(--primary-accent);
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Form */
+form {
+    text-align: center;
+    margin: 30px 0;
+}
+input {
+    padding: 15px;
+    width: 50%;
+    max-width: 400px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+input:focus {
+    outline: none;
+    box-shadow: 0 4px 15px rgba(93,51,78,0.5);
+}
+button {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 50px;
+    background: var(--secondary-accent);
+    color: var(--primary-accent);
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: 0.3s;
+}
+button:hover {
+    background: var(--primary-accent);
+    color: white;
+}
+
+/* Recipe Cards */
+.cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 40px 20px;
+    gap: 30px;
+}
+.card {
+    width: 300px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.card:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 20px 35px rgba(0,0,0,0.25);
+}
+.card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+.card .title {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 15px 10px 5px;
+    color: var(--primary-accent);
+}
+.card p {
+    margin: 5px 10px 10px;
+    font-size: 14px;
+    color: var(--text-color);
+}
+.card .label {
+    display: inline-block;
+    padding: 5px 10px;
+    background: var(--secondary-accent);
+    color: var(--primary-accent);
+    border-radius: 15px;
+    font-size: 12px;
+    margin: 5px;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    background: var(--primary-accent);
+    color: white;
+    font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cards {
+        flex-direction: column;
+        align-items: center;
+    }
+    input {
+        width: 70%;
+    }
+}
+</style>
+</head>
+<body>
+
+<header>🍳 Recipe Finder</header>
+
+<form method="POST">
+    <input type="text" name="dish" placeholder="Search for recipes...">
+    <button type="submit">Search</button>
+</form>
+
+<div class="cards">
+    {% if recipes %}
+        {% for r in recipes %}
+        <div class="card">
+            <img src="{{ r.image }}" alt="Recipe Image">
+            <div class="title">{{ r.title }}</div>
+            <p class="label">Ready in {{ r.readyInMinutes }} mins</p>
+            {% if r.summary %}
+            <p>{{ r.summary | safe }}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<footer>© 2026 Recipe Finder | Made by Najia</footer>
+
+</body>
+</html>
