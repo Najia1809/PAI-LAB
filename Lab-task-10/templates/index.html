@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grand Palace Hotel - Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: #f0f6ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        .header {
+            width: 100%;
+            background: linear-gradient(135deg, #1a73e8, #4dabf7);
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 15px rgba(26, 115, 232, 0.3);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-logo {
+            font-size: 40px;
+        }
+
+        .header-title h1 {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .header-title p {
+            color: rgba(255,255,255,0.85);
+            font-size: 13px;
+        }
+
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #90ee90;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .status-text {
+            color: white;
+            font-size: 13px;
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            width: 100%;
+            max-width: 750px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* CHAT BOX */
+        .chat-box {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 2px 20px rgba(26, 115, 232, 0.1);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #1a73e8, #4dabf7);
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-header-icon {
+            font-size: 28px;
+        }
+
+        .chat-header h3 {
+            color: white;
+            font-size: 16px;
+        }
+
+        .chat-header p {
+            color: rgba(255,255,255,0.85);
+            font-size: 12px;
+        }
+
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #f0f6ff;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #4dabf7;
+            border-radius: 10px;
+        }
+
+        /* MESSAGES */
+        .message {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .bot-avatar {
+            background: linear-gradient(135deg, #1a73e8, #4dabf7);
+        }
+
+        .user-avatar {
+            background: linear-gradient(135deg, #74b9ff, #a29bfe);
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .bot-bubble {
+            background: white;
+            color: #444;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .user-bubble {
+            background: linear-gradient(135deg, #1a73e8, #4dabf7);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        /* TYPING INDICATOR */
+        .typing {
+            display: none;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .typing-bubble {
+            background: white;
+            padding: 12px 18px;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #4dabf7;
+            border-radius: 50%;
+            animation: bounce 1s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* INPUT AREA */
+        .chat-input {
+            padding: 20px 25px;
+            background: white;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            border-top: 1px solid #d0e8ff;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #d0e8ff;
+            border-radius: 25px;
+            outline: none;
+            font-size: 14px;
+            color: #444;
+            transition: border 0.3s;
+        }
+
+        .chat-input input:focus {
+            border-color: #1a73e8;
+        }
+
+        .chat-input input::placeholder {
+            color: #bbb;
+        }
+
+        .send-btn {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #1a73e8, #4dabf7);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: transform 0.2s;
+            box-shadow: 0 3px 10px rgba(26, 115, 232, 0.4);
+        }
+
+        .send-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* QUICK BUTTONS */
+        .quick-buttons {
+            background: white;
+            border-radius: 15px;
+            padding: 20px 25px;
+            box-shadow: 0 2px 10px rgba(26, 115, 232, 0.1);
+        }
+
+        .quick-buttons p {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .quick-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .quick-btn {
+            background: #f0f6ff;
+            border: 1px solid #d0e8ff;
+            color: #1a73e8;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: #1a73e8;
+            color: white;
+        }
+
+        /* FOOTER */
+        .footer {
+            width: 100%;
+            background: white;
+            padding: 20px;
+            text-align: center;
+            color: #bbb;
+            font-size: 12px;
+            border-top: 1px solid #d0e8ff;
+            margin-top: auto;
+        }
+
+        .footer span {
+            color: #1a73e8;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <div class="header-logo">🏨</div>
+            <div class="header-title">
+                <h1>Grand Palace Hotel</h1>
+                <p>Your Luxury Stay Awaits</p>
+            </div>
+        </div>
+        <div class="header-status">
+            <div class="status-dot"></div>
+            <span class="status-text">Online 24/7</span>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="container">
+
+        <!-- CHAT BOX -->
+        <div class="chat-box">
+            <div class="chat-header">
+                <div class="chat-header-icon">💬</div>
+                <div>
+                    <h3>Hotel Information Assistant</h3>
+                    <p>Ask me anything about our hotel!</p>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message">
+                    <div class="message-avatar bot-avatar">🤖</div>
+                    <div class="message-bubble bot-bubble">
+                        👋 Welcome to Grand Palace Hotel!<br><br>
+                        I can help you with room types, prices, amenities, bookings and much more.
+                        How can I assist you today? 🏨
+                    </div>
+                </div>
+            </div>
+
+            <!-- TYPING INDICATOR -->
+            <div class="typing" id="typing">
+                <div class="message-avatar bot-avatar">🤖</div>
+                <div class="typing-bubble">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+
+            <!-- INPUT -->
+            <div class="chat-input">
+                <input type="text" id="userInput" placeholder="Type your question here..." />
+                <button class="send-btn" onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+
+        <!-- QUICK BUTTONS -->
+        <div class="quick-buttons">
+            <p>💡 Quick Questions — click to try:</p>
+            <div class="quick-btns">
+                <button class="quick-btn" onclick="quickSend('What room types are available?')">🛏️ Room Types</button>
+                <button class="quick-btn" onclick="quickSend('What are the prices?')">💰 Prices</button>
+                <button class="quick-btn" onclick="quickSend('What amenities do you offer?')">🏊 Amenities</button>
+                <button class="quick-btn" onclick="quickSend('How can I book a room?')">📅 Booking</button>
+                <button class="quick-btn" onclick="quickSend('What is the check in time?')">🔑 Check In</button>
+                <button class="quick-btn" onclick="quickSend('What is the check out time?')">🚪 Check Out</button>
+                <button class="quick-btn" onclick="quickSend('Do you have a restaurant?')">🍽️ Restaurant</button>
+                <button class="quick-btn" onclick="quickSend('Where is the hotel located?')">📍 Location</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        Made with <span>♥</span> | Grand Palace Hotel Assistant | Powered by <span>Flask & NLTK</span>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            appendMessage(message, 'user');
+            input.value = '';
+
+            document.getElementById('typing').style.display = 'flex';
+            scrollToBottom();
+
+            fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('typing').style.display = 'none';
+                appendMessage(data.response, 'bot');
+                scrollToBottom();
+            });
+        }
+
+        function appendMessage(text, sender) {
+            const messages = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
+
+            if (sender === 'bot') {
+                div.innerHTML = `
+                    <div class="message-avatar bot-avatar">🤖</div>
+                    <div class="message-bubble bot-bubble">${text}</div>`;
+            } else {
+                div.innerHTML = `
+                    <div class="message-avatar user-avatar">🧑</div>
+                    <div class="message-bubble user-bubble">${text}</div>`;
+            }
+
+            messages.appendChild(div);
+            scrollToBottom();
+        }
+
+        function quickSend(text) {
+            document.getElementById('userInput').value = text;
+            sendMessage();
+        }
+
+        function scrollToBottom() {
+            const messages = document.getElementById('chatMessages');
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+
+</body>
+</html>
